@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public final class BankAccount implements Serializable {
+    //TODO ask if I can have a history of all transactions, withdrawals and deposits and sorted by date ArrayList<Object> history
     private String accountHoldersName;
     private int accountNumber;
     private int password;

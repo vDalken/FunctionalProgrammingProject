@@ -92,6 +92,7 @@ public class Main {
                 case WITHDRAWAL:
                     break;
                 case DEPOSIT:
+                    deposit(scan);
                     break;
                 case BLOCK_CARD:
                     break;
@@ -105,7 +106,7 @@ public class Main {
         } while (choice != LEAVE);
     }
 
-    public static void transfer(Scanner scan) {
+    private static void transfer(Scanner scan) {
         Log.printAccountNumberQuestion();
         int accountNumber = scan.nextInt();
         Log.printAmountQuestion();
@@ -117,5 +118,11 @@ public class Main {
             Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
             bankAccountsHandler.documentTransaction(transaction);
         }
+    }
+
+    private static void deposit(Scanner scan){
+        Log.printAmountQuestion();
+        int amount = scan.nextInt();
+        bankAccountsHandler.deposit(loggedAccount.getAccountNumber(), amount);
     }
 }

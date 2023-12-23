@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class BankDataHandler implements Serializable {
+    //TODO ask if I can use the try with resources without declaring and initializing the same thing everytime
     private final String BANK_ACCOUNTS_FILE_PATH;
     private final String TRANSACTIONS_FILE_PATH;
     private final ArrayList<BankAccount> temporaryBankAccounts = new ArrayList<>();
@@ -116,5 +117,25 @@ public class BankDataHandler implements Serializable {
             throw new RuntimeException(e);
         }
         return false;
+    }
+
+    public void deposit(int loggedAccountNumber, int amount){
+        temporaryBankAccounts.clear();
+        try(FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+            while(objectInputStream.available()>0){
+                BankAccount bankAccount = (BankAccount) objectInputStream.readObject();
+                if(bankAccount.getAccountNumber()==loggedAccountNumber){
+                    double newBalance = bankAccount.getBalance()+ amount;
+                    BankAccount updatedBankAccount = updateBankAccount(bankAccount,newBalance);
+                    temporaryBankAccounts.add(updatedBankAccount);
+                    continue;
+                }
+                temporaryBankAccounts.add(bankAccount);
+             }
+            updateBankAccountsFile(temporaryBankAccounts);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
