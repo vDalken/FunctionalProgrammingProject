@@ -83,6 +83,8 @@ public class BankAccountsHandler implements Serializable {
     }
 
     private void documentTransaction(BankAccount loggedAccount, int accountNumber, int amountToTransfer){
+        try(FileOutputStream fileOutputStream = new FileOutputStream()){
 
+        }
     }
 }
