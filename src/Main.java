@@ -13,7 +13,11 @@ public class Main {
     private final static int BLOCK_CARD = 4;
     private final static int CARD_INFO = 5;
     private final static String BANK_ACCOUNTS_FILE_PATH = "resources/BankAccounts.ser";
-    private final static BankAccountsHandler bankAccountsHandler = new BankAccountsHandler(BANK_ACCOUNTS_FILE_PATH);
+    private final static String TRANSACTIONS_FILE_PATH = "resources/AllTransactions.ser";
+    private final static BankDataHandler bankAccountsHandler = new BankDataHandler(
+            BANK_ACCOUNTS_FILE_PATH,
+            TRANSACTIONS_FILE_PATH
+    );
     private static BankAccount loggedAccount;
 
     public static void main(String[] args) {
@@ -105,5 +109,6 @@ public class Main {
         Log.printAmountQuestion();
         int amountToTransfer = scan.nextInt();
         bankAccountsHandler.transfer(loggedAccount, accountNumber, amountToTransfer);
+
     }
 }
