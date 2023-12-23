@@ -5,7 +5,7 @@ public class BankAccountBuilder {
     private int accountNumber;
     private int password;
     private double balance;
-    private ArrayList<String> transactionHistory;
+    private ArrayList<Transaction> transactionHistory;
     private String accountOpeningDate;
     private AccountStatus accountStatus;
 
@@ -29,7 +29,7 @@ public class BankAccountBuilder {
         return this;
     }
 
-    public BankAccountBuilder transactionHistory(ArrayList<String> transactionHistory) {
+    public BankAccountBuilder transactionHistory(ArrayList<Transaction> transactionHistory) {
         this.transactionHistory = transactionHistory;
         return this;
     }
@@ -60,7 +60,7 @@ public class BankAccountBuilder {
         return balance;
     }
 
-    public ArrayList<String> getTransactionHistory() {
+    public ArrayList<Transaction> getTransactionHistory() {
         return transactionHistory;
     }
 

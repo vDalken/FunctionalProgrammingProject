@@ -52,6 +52,7 @@ public class Main {
 
     private static void createAccount(Scanner scan) {
         Log.printAccountsHoldersNameQuestion();
+        scan.nextLine();
         String accountHoldersName = scan.nextLine();
         BankAccount newAccount = new BankAccount(accountHoldersName);
         Log.printNewAccountInformation(newAccount);
@@ -95,6 +96,7 @@ public class Main {
                 case BLOCK_CARD:
                     break;
                 case CARD_INFO:
+                    System.out.println(loggedAccount.toString());
                     break;
                 default:
                     Log.printChoiceErrorMessage();
@@ -108,7 +110,12 @@ public class Main {
         int accountNumber = scan.nextInt();
         Log.printAmountQuestion();
         int amountToTransfer = scan.nextInt();
-        bankAccountsHandler.transfer(loggedAccount, accountNumber, amountToTransfer);
-
+        if (bankAccountsHandler.isAccountNumberValid(accountNumber) && loggedAccount.getBalance()>amountToTransfer) {
+            bankAccountsHandler.transfer(loggedAccount, accountNumber, amountToTransfer);
+        }else{
+            Log.printAccountTransferError();
+            Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
+            bankAccountsHandler.documentTransaction(transaction);
+        }
     }
 }

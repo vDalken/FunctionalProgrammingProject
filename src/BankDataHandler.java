@@ -40,21 +40,25 @@ public class BankDataHandler implements Serializable {
         try (FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
             BankAccount bankAccount;
-            boolean wasSuccessful = false;
             while (objectInputStream.available() > 0) {
                 bankAccount = (BankAccount) objectInputStream.readObject();
-                if (bankAccount.getAccountNumber() == accountNumber && loggedAccount.getBalance() > amountToTransfer) {
+                if (bankAccount.getAccountNumber() == accountNumber) {
                     double newBalance = bankAccount.getBalance() + amountToTransfer;
                     BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
                     temporaryBankAccounts.add(updatedBankAccount);
-                    wasSuccessful = true;
+                    continue;
+                }
+                if (bankAccount.getAccountNumber() == loggedAccount.getAccountNumber()) {
+                    double newBalance = bankAccount.getBalance() - amountToTransfer;
+                    BankAccount updatedBankAccount = updateBankAccount(loggedAccount, newBalance);
+                    temporaryBankAccounts.add(updatedBankAccount);
+                    continue;
                 }
                 temporaryBankAccounts.add(bankAccount);
             }
-            if (wasSuccessful) {
-                updateBankAccountsFile(temporaryBankAccounts);
-            }
-            Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, wasSuccessful);
+
+            updateBankAccountsFile(temporaryBankAccounts);
+            Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, true);
             documentTransaction(transaction);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -89,7 +93,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    private void documentTransaction(Transaction transaction) {
+    public void documentTransaction(Transaction transaction) {
         try (FileOutputStream fileOutputStream = new FileOutputStream(TRANSACTIONS_FILE_PATH, true);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
         ) {
@@ -97,5 +101,20 @@ public class BankDataHandler implements Serializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isAccountNumberValid(int accountNumber) {
+        try (FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            while (objectInputStream.available() > 0) {
+                BankAccount bankAccount = (BankAccount) objectInputStream.readObject();
+                if (bankAccount.getAccountNumber() == accountNumber) {
+                    return true;
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
     }
 }

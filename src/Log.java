@@ -64,4 +64,8 @@ public final class Log {
     public static void printAmountQuestion(){
         System.out.println("Write the amount you want to transfer");
     }
+
+    public static void printAccountTransferError(){
+        System.out.println("\nThe details you provided were wrong.\nMake sure everything you provided is true\n");
+    }
 }

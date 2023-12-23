@@ -10,7 +10,7 @@ public final class BankAccount implements Serializable {
     private int password;
     private double balance;
     private static final String CURRENCY = "€";
-    private ArrayList<String> transactionHistory;
+    private ArrayList<Transaction> transactionHistory;
     private String accountOpeningDate;
     private AccountStatus accountStatus;
     private final static String dateFormat = "dd-MM-yyyy";
@@ -70,7 +70,7 @@ public final class BankAccount implements Serializable {
         return password;
     }
 
-    public ArrayList<String> getTransactionHistory() {
+    public ArrayList<Transaction> getTransactionHistory() {
         return transactionHistory;
     }
 
@@ -100,5 +100,17 @@ public final class BankAccount implements Serializable {
                 .accountOpeningDate(account.getAccountOpeningDate())
                 .accountStatus(account.getAccountStatus())
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "Your bank account info" +
+                "\nAccount Holders Name: " + accountHoldersName +
+                "\nAccount Number: " + accountNumber +
+                "\nPassword=" + password +
+                "\nBalance=" + balance +
+                "\nTransaction History=" + transactionHistory +
+                "\nAccount Opening Date='" + accountOpeningDate + '\'' +
+                "\nAccount Status=" + accountStatus;
     }
 }
