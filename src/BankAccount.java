@@ -31,10 +31,11 @@ public final class BankAccount implements Serializable {
         accountStatus = AccountStatus.ACTIVE;
     }
 
-    public BankAccount(BankAccountBuilder bankAccount){
-        this.accountHoldersName =bankAccount.getAccountHoldersName();
+    public BankAccount(BankAccountBuilder bankAccount) {
+        this.accountHoldersName = bankAccount.getAccountHoldersName();
         this.accountNumber = bankAccount.getAccountNumber();
-        this.password = bankAccount.getPassword();;
+        this.password = bankAccount.getPassword();
+        ;
         this.balance = bankAccount.getBalance();
         this.transactionHistory = bankAccount.getTransactionHistory();
         this.accountOpeningDate = bankAccount.getAccountOpeningDate();
@@ -83,12 +84,12 @@ public final class BankAccount implements Serializable {
         return accountStatus;
     }
 
-    public BankAccount deposit(DepositOperation depositOperation, double amount){
-        return depositOperation.perform(this,amount);
+    public BankAccount deposit(DepositOperation depositOperation, double amount) {
+        return depositOperation.perform(this, amount);
     }
 
-    public BankAccount withdrawal(WithdrawalOperation withdrawalOperation, double amount){
-        return withdrawalOperation.perform(this,amount);
+    public BankAccount withdrawal(WithdrawalOperation withdrawalOperation, double amount) {
+        return withdrawalOperation.perform(this, amount);
     }
 
     public static BankAccount createAccountWithUpdatedBalance(BankAccount account, double newBalance) {
@@ -105,13 +106,13 @@ public final class BankAccount implements Serializable {
 
     @Override
     public String toString() {
-        return "Your bank account info" +
+        return "\nYour bank account info" +
                 "\nAccount Holders Name: " + accountHoldersName +
                 "\nAccount Number: " + accountNumber +
                 "\nPassword=" + password +
                 "\nBalance=" + balance +
                 "\nTransaction History=" + transactionHistory +
                 "\nAccount Opening Date='" + accountOpeningDate + '\'' +
-                "\nAccount Status=" + accountStatus;
+                "\nAccount Status=" + accountStatus + "\n";
     }
 }

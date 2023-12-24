@@ -14,21 +14,21 @@ public class BankDataHandler implements Serializable {
     }
 
     public void createAccount(BankAccount bankAccount) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(BANK_ACCOUNTS_FILE_PATH);
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-            objectOutputStream.writeObject(bankAccount);
+        temporaryBankAccounts.clear();
+        try (MyObjectOutputStream myObjectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH))) {
+            myObjectOutputStream.writeObject(bankAccount);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
     }
 
     public Optional<BankAccount> logIn(int accountNumber, int password) {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
+        try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
             while (true) {
                 try {
-                    bankAccount = (BankAccount) objectInputStream.readObject();
-                }catch(EOFException error){
+                    bankAccount = (BankAccount) myObjectInputStream.readObject();
+                } catch (EOFException error) {
                     break;
                 }
                 if (bankAccount.getAccountNumber() == accountNumber && bankAccount.getPassword() == password) {
@@ -43,11 +43,14 @@ public class BankDataHandler implements Serializable {
 
     public void transfer(BankAccount loggedAccount, int accountNumber, int amountToTransfer) {
         temporaryBankAccounts.clear();
-        try (FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+        try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
-            while (objectInputStream.available() > 0) {
-                bankAccount = (BankAccount) objectInputStream.readObject();
+            while (true) {
+                try {
+                    bankAccount = (BankAccount) myObjectInputStream.readObject();
+                } catch (EOFException error) {
+                    break;
+                }
                 if (bankAccount.getAccountNumber() == accountNumber) {
                     double newBalance = bankAccount.getBalance() + amountToTransfer;
                     BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
@@ -84,8 +87,7 @@ public class BankDataHandler implements Serializable {
     }
 
     private void updateBankAccountsFile(ArrayList<BankAccount> temporaryBankAccounts) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(BANK_ACCOUNTS_FILE_PATH);
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+        try (MyObjectOutputStream objectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH))) {
             temporaryBankAccounts
                     .forEach(bankAccountToWrite -> {
                         try {
@@ -100,9 +102,7 @@ public class BankDataHandler implements Serializable {
     }
 
     public void documentTransaction(Transaction transaction) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(TRANSACTIONS_FILE_PATH, true);
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
-        ) {
+        try (MyObjectOutputStream objectOutputStream = new MyObjectOutputStream(new FileOutputStream(TRANSACTIONS_FILE_PATH,true))) {
             objectOutputStream.writeObject(transaction);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -110,10 +110,14 @@ public class BankDataHandler implements Serializable {
     }
 
     public boolean isAccountNumberValid(int accountNumber) {
-        try (FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-            while (objectInputStream.available() > 0) {
-                BankAccount bankAccount = (BankAccount) objectInputStream.readObject();
+        try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
+            BankAccount bankAccount;
+            while (true) {
+                try {
+                    bankAccount = (BankAccount) myObjectInputStream.readObject();
+                } catch (EOFException error) {
+                    break;
+                }
                 if (bankAccount.getAccountNumber() == accountNumber) {
                     return true;
                 }
@@ -126,10 +130,14 @@ public class BankDataHandler implements Serializable {
 
     public void deposit(int loggedAccountNumber, int amount) {
         temporaryBankAccounts.clear();
-        try (FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-            while (objectInputStream.available() > 0) {
-                BankAccount bankAccount = (BankAccount) objectInputStream.readObject();
+        try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
+            BankAccount bankAccount;
+            while (true) {
+                try {
+                    bankAccount = (BankAccount) myObjectInputStream.readObject();
+                } catch (EOFException error) {
+                    break;
+                }
                 if (bankAccount.getAccountNumber() == loggedAccountNumber) {
                     double newBalance = bankAccount.getBalance() + amount;
                     BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
