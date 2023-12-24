@@ -3,6 +3,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public final class BankAccount implements Serializable {
     //TODO ask if I can have a history of all transactions, withdrawals and deposits and sorted by date ArrayList<Object> history
@@ -104,6 +105,13 @@ public final class BankAccount implements Serializable {
                 .build();
     }
 
+    private String showTransactionHistory(){
+        return getTransactionHistory()
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining("\n"));
+    }
+
     @Override
     public String toString() {
         return "\nYour bank account info" +
@@ -111,8 +119,8 @@ public final class BankAccount implements Serializable {
                 "\nAccount Number: " + accountNumber +
                 "\nPassword=" + password +
                 "\nBalance=" + balance +
-                "\nTransaction History=" + transactionHistory +
-                "\nAccount Opening Date='" + accountOpeningDate + '\'' +
+                "\n\nTransaction History:\n" + showTransactionHistory() +
+                "\n\nAccount Opening Date='" + accountOpeningDate + '\'' +
                 "\nAccount Status=" + accountStatus + "\n";
     }
 }

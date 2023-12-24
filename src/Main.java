@@ -119,8 +119,9 @@ public class Main {
             loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amountToTransfer);
         } else {
             Log.printAccountTransferError();
+            bankAccountsHandler.transfer(loggedAccount,accountNumber,amountToTransfer);
             Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
-            bankAccountsHandler.documentTransaction(transaction);
+            loggedAccount.getTransactionHistory().add(transaction);
         }
     }
 
