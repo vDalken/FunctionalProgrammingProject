@@ -80,6 +80,7 @@ public class Main {
     private static void loggedMenu(Scanner scan) {
         int choice;
         do {
+            if(loggedAccount==null){break;}
             Log.printLoggedMenu();
             choice = scan.nextInt();
             switch (choice) {
@@ -96,7 +97,7 @@ public class Main {
                     deposit(scan);
                     break;
                 case BLOCK_CARD:
-
+                    blockCard(scan);
                     break;
                 case CARD_INFO:
                     System.out.println(loggedAccount.toString());
@@ -140,6 +141,17 @@ public class Main {
             bankAccountsHandler.withdrawal(loggedAccount.getAccountNumber(), amount);
             loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amount);
             Log.printSuccessfulWithdrawal();
+        }
+    }
+
+    private static void blockCard(Scanner scan){
+        Log.printBlockBankAccountQuestion();
+        scan.nextLine();
+        String choice = scan.nextLine();
+        if(choice.trim().equals("Y")){
+            bankAccountsHandler.blockCard(loggedAccount.getAccountNumber());
+            loggedAccount=null;
+            Log.printBlockedBankAccountMessage();
         }
     }
 }

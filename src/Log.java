@@ -84,4 +84,13 @@ public final class Log {
     public static void printSuccessfulDeposit(){
         System.out.println("Successful deposit");
     }
+
+    public static void printBlockBankAccountQuestion(){
+        System.out.println("Are you sure you want to block your bank account? Y for yes and n for no");
+        System.out.println("After this, your bank account will be inaccessible");
+    }
+
+    public static void printBlockedBankAccountMessage(){
+        System.out.println("Your bank account was blocked");
+    }
 }
