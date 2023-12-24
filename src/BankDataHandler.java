@@ -25,7 +25,12 @@ public class BankDataHandler implements Serializable {
     public Optional<BankAccount> logIn(int accountNumber, int password) {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
-            while ((bankAccount = (BankAccount) objectInputStream.readObject()) != null) {
+            while (true) {
+                try {
+                    bankAccount = (BankAccount) objectInputStream.readObject();
+                }catch(EOFException error){
+                    break;
+                }
                 if (bankAccount.getAccountNumber() == accountNumber && bankAccount.getPassword() == password) {
                     return Optional.of(bankAccount);
                 }
@@ -119,20 +124,20 @@ public class BankDataHandler implements Serializable {
         return false;
     }
 
-    public void deposit(int loggedAccountNumber, int amount){
+    public void deposit(int loggedAccountNumber, int amount) {
         temporaryBankAccounts.clear();
-        try(FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
-            while(objectInputStream.available()>0){
+        try (FileInputStream fileInputStream = new FileInputStream(BANK_ACCOUNTS_FILE_PATH);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            while (objectInputStream.available() > 0) {
                 BankAccount bankAccount = (BankAccount) objectInputStream.readObject();
-                if(bankAccount.getAccountNumber()==loggedAccountNumber){
-                    double newBalance = bankAccount.getBalance()+ amount;
-                    BankAccount updatedBankAccount = updateBankAccount(bankAccount,newBalance);
+                if (bankAccount.getAccountNumber() == loggedAccountNumber) {
+                    double newBalance = bankAccount.getBalance() + amount;
+                    BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
                     temporaryBankAccounts.add(updatedBankAccount);
                     continue;
                 }
                 temporaryBankAccounts.add(bankAccount);
-             }
+            }
             updateBankAccountsFile(temporaryBankAccounts);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
