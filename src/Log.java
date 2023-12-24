@@ -68,4 +68,16 @@ public final class Log {
     public static void printAccountTransferError(){
         System.out.println("\nThe details you provided were wrong.\nMake sure everything you provided is true\n");
     }
+
+    public static void printNotEnoughBalance(){
+        System.out.println("Not enough balance to withdraw that amount");
+    }
+
+    public static void printSuccessfulWithdrawal(){
+        System.out.println("Successful withdrawal");
+    }
+
+    public static void printSuccessfulDeposit(){
+        System.out.println("Successful deposit");
+    }
 }

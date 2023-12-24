@@ -15,7 +15,7 @@ public class BankDataHandler implements Serializable {
 
     public void createAccount(BankAccount bankAccount) {
         temporaryBankAccounts.clear();
-        try (MyObjectOutputStream myObjectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH))) {
+        try (MyObjectOutputStream myObjectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH,true))) {
             myObjectOutputStream.writeObject(bankAccount);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -140,8 +140,32 @@ public class BankDataHandler implements Serializable {
                 }
                 if (bankAccount.getAccountNumber() == loggedAccountNumber) {
                     double newBalance = bankAccount.getBalance() + amount;
-                    BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
-                    temporaryBankAccounts.add(updatedBankAccount);
+                    bankAccount = updateBankAccount(bankAccount, newBalance);
+                    temporaryBankAccounts.add(bankAccount);
+                    continue;
+                }
+                temporaryBankAccounts.add(bankAccount);
+            }
+            updateBankAccountsFile(temporaryBankAccounts);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void withdrawal(int loggedAccountNumber, int amount){
+        temporaryBankAccounts.clear();
+        try(MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))){
+            BankAccount bankAccount;
+            while(true){
+                try{
+                    bankAccount = (BankAccount) myObjectInputStream.readObject();
+                } catch (EOFException error) {
+                   break;
+                }
+                if(bankAccount.getAccountNumber()==loggedAccountNumber){
+                    double newBalance = bankAccount.getBalance()-amount;
+                    bankAccount=updateBankAccount(bankAccount,newBalance);
+                    temporaryBankAccounts.add(bankAccount);
                     continue;
                 }
                 temporaryBankAccounts.add(bankAccount);

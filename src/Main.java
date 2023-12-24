@@ -90,11 +90,13 @@ public class Main {
                     transfer(scan);
                     break;
                 case WITHDRAWAL:
+                    withdrawal(scan);
                     break;
                 case DEPOSIT:
                     deposit(scan);
                     break;
                 case BLOCK_CARD:
+
                     break;
                 case CARD_INFO:
                     System.out.println(loggedAccount.toString());
@@ -111,18 +113,32 @@ public class Main {
         int accountNumber = scan.nextInt();
         Log.printAmountQuestion();
         int amountToTransfer = scan.nextInt();
-        if (bankAccountsHandler.isAccountNumberValid(accountNumber) && loggedAccount.getBalance()>amountToTransfer) {
+        if (bankAccountsHandler.isAccountNumberValid(accountNumber) && loggedAccount.getBalance() > amountToTransfer) {
             bankAccountsHandler.transfer(loggedAccount, accountNumber, amountToTransfer);
-        }else{
+        } else {
             Log.printAccountTransferError();
             Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
             bankAccountsHandler.documentTransaction(transaction);
         }
     }
 
-    private static void deposit(Scanner scan){
+    private static void deposit(Scanner scan) {
         Log.printAmountQuestion();
         int amount = scan.nextInt();
         bankAccountsHandler.deposit(loggedAccount.getAccountNumber(), amount);
+        loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() + amount);
+        Log.printSuccessfulDeposit();
+    }
+
+    private static void withdrawal(Scanner scan) {
+        Log.printAmountQuestion();
+        int amount = scan.nextInt();
+        if (amount > loggedAccount.getBalance()) {
+            Log.printNotEnoughBalance();
+        } else {
+            bankAccountsHandler.withdrawal(loggedAccount.getAccountNumber(), amount);
+            loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amount);
+            Log.printSuccessfulWithdrawal();
+        }
     }
 }
