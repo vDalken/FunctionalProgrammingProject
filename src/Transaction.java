@@ -1,4 +1,6 @@
-public class Transaction {
+import java.io.Serializable;
+
+public class Transaction implements Serializable {
     private final int loggedAccountNumber;
     private final int accountNumber;
     private final int amountToTransfer;

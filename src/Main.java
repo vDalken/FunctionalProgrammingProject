@@ -61,7 +61,7 @@ public class Main {
 
     private static void logIn(Scanner scan) {
         try {
-            Log.printAccountNumberQuestion();
+            Log.printYourAccountNumberQuestion();
             int accountNumber = scan.nextInt();
             Log.printPasswordQuestion();
             int password = scan.nextInt();
@@ -113,8 +113,9 @@ public class Main {
         int accountNumber = scan.nextInt();
         Log.printAmountQuestion();
         int amountToTransfer = scan.nextInt();
-        if (bankAccountsHandler.isAccountNumberValid(accountNumber) && loggedAccount.getBalance() > amountToTransfer) {
+        if (bankAccountsHandler.isAccountNumberValid(accountNumber) && loggedAccount.getBalance() >= amountToTransfer) {
             bankAccountsHandler.transfer(loggedAccount, accountNumber, amountToTransfer);
+            loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amountToTransfer);
         } else {
             Log.printAccountTransferError();
             Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);

@@ -30,8 +30,12 @@ public final class Log {
         System.out.println("Which name you would like to have as your account holder name?");
     }
 
-    public static void printAccountNumberQuestion(){
+    public static void printYourAccountNumberQuestion(){
         System.out.println("Write your account number");
+    }
+
+    public static void printAccountNumberQuestion(){
+        System.out.println("Write the account number you want to transfer the money to");
     }
 
     public static void printPasswordQuestion(){
@@ -62,7 +66,7 @@ public final class Log {
     }
 
     public static void printAmountQuestion(){
-        System.out.println("Write the amount you want to transfer");
+        System.out.println("Write the amount");
     }
 
     public static void printAccountTransferError(){
