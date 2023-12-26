@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class BankDataHandler implements Serializable {
@@ -14,85 +16,68 @@ public class BankDataHandler implements Serializable {
     }
 
     public void createAccount(BankAccount bankAccount) {
-        temporaryBankAccounts.clear();
         try (MyObjectOutputStream myObjectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH, true))) {
             myObjectOutputStream.writeObject(bankAccount);
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println(Arrays.toString(e.getStackTrace()));
         }
     }
 
     public Optional<BankAccount> logIn(int accountNumber, int password) {
-        try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
-            BankAccount bankAccount;
-            while (true) {
-                try {
-                    bankAccount = (BankAccount) myObjectInputStream.readObject();
-                } catch (EOFException error) {
-                    break;
-                }
-                if (bankAccount.getAccountNumber() == accountNumber && bankAccount.getPassword() == password && bankAccount.getAccountStatus().equals(AccountStatus.ACTIVE)) {
-                    return Optional.of(bankAccount);
-                }
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return Optional.empty();
+        return readFromBankFile(BANK_ACCOUNTS_FILE_PATH)
+                .stream()
+                .filter(account -> account.getAccountNumber() == accountNumber &&
+                        account.getPassword() == password &&
+                        account.getAccountStatus().equals(AccountStatus.ACTIVE))
+                .findFirst();
     }
 
-    public void transfer(BankAccount loggedAccount, int accountNumber, int amountToTransfer) {
-        temporaryBankAccounts.clear();
+    public void processTransfer(BankAccount loggedAccount, int accountNumber, int amountToTransfer) {
+        List<BankAccount> accounts = readFromBankFile(BANK_ACCOUNTS_FILE_PATH);
+
         if (!isAccountNumberValid(accountNumber) || !(loggedAccount.getBalance() >= amountToTransfer)) {
             Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
             documentTransaction(transaction);
             updateLoggedAccountTransactionHistory(loggedAccount.getAccountNumber(), transaction);
             return;
         }
+
+        List<BankAccount> updatedAccounts = accounts.stream()
+                .map(account -> {
+                    if (account.getAccountNumber() == accountNumber) {
+                        double newBalance = account.getBalance() + amountToTransfer;
+                        return updateBankAccount(account, newBalance);
+                    }
+                    if (account.getAccountNumber() == loggedAccount.getAccountNumber()) {
+                        double newBalance = account.getBalance() - amountToTransfer;
+                        Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, true);
+                        updateLoggedAccountTransactionHistory(loggedAccount.getAccountNumber(), transaction);
+                        return updateBankAccount(account, newBalance, transaction);
+                    }
+                    return account;
+                })
+                .toList();
+
+        updateBankAccountsFile(updatedAccounts);
+    }
+
+    private BankAccount updateBankAccount(BankAccount bankAccount, double newBalance, Transaction transaction) {
+        BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
+        updatedBankAccount.getTransactionHistory().add(transaction);
+        return updatedBankAccount;
+    }
+
+    private void updateLoggedAccountTransactionHistory(int loggedAccountNumber, Transaction transaction) {
+        List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
-            Transaction transaction = null;
             while (true) {
                 try {
                     bankAccount = (BankAccount) myObjectInputStream.readObject();
                 } catch (EOFException error) {
                     break;
                 }
-                if (bankAccount.getAccountNumber() == accountNumber) {
-                    double newBalance = bankAccount.getBalance() + amountToTransfer;
-                    BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
-                    temporaryBankAccounts.add(updatedBankAccount);
-                    continue;
-                }
-                if (bankAccount.getAccountNumber() == loggedAccount.getAccountNumber()) {
-                    double newBalance = bankAccount.getBalance() - amountToTransfer;
-                    BankAccount updatedBankAccount = updateBankAccount(loggedAccount, newBalance);
-                    transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, true);
-                    updatedBankAccount.getTransactionHistory().add(transaction);
-                    temporaryBankAccounts.add(updatedBankAccount);
-                    continue;
-                }
-                temporaryBankAccounts.add(bankAccount);
-            }
-
-            updateBankAccountsFile(temporaryBankAccounts);
-            documentTransaction(transaction);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void updateLoggedAccountTransactionHistory(int loggedAccountNumber, Transaction transaction) {
-        temporaryBankAccounts.clear();
-        try(MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))){
-            BankAccount bankAccount;
-            while(true){
-                try{
-                    bankAccount = (BankAccount) myObjectInputStream.readObject();
-                } catch(EOFException error){
-                    break;
-                }
-                if(bankAccount.getAccountNumber() == loggedAccountNumber){
+                if (bankAccount.getAccountNumber() == loggedAccountNumber) {
                     bankAccount.getTransactionHistory().add(transaction);
                     temporaryBankAccounts.add(bankAccount);
                     continue;
@@ -129,7 +114,7 @@ public class BankDataHandler implements Serializable {
                 .build();
     }
 
-    private void updateBankAccountsFile(ArrayList<BankAccount> temporaryBankAccounts) {
+    private void updateBankAccountsFile(List<BankAccount> temporaryBankAccounts) {
         try (MyObjectOutputStream objectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH))) {
             temporaryBankAccounts
                     .forEach(bankAccountToWrite -> {
@@ -172,7 +157,7 @@ public class BankDataHandler implements Serializable {
     }
 
     public void deposit(int loggedAccountNumber, int amount) {
-        temporaryBankAccounts.clear();
+        List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
             while (true) {
@@ -196,7 +181,7 @@ public class BankDataHandler implements Serializable {
     }
 
     public void withdrawal(int loggedAccountNumber, int amount) {
-        temporaryBankAccounts.clear();
+        List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
             while (true) {
@@ -220,7 +205,7 @@ public class BankDataHandler implements Serializable {
     }
 
     public void blockCard(int loggedAccountNumber) {
-        temporaryBankAccounts.clear();
+        List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
             while (true) {
@@ -237,6 +222,23 @@ public class BankDataHandler implements Serializable {
                 temporaryBankAccounts.add(bankAccount);
             }
             updateBankAccountsFile(temporaryBankAccounts);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<BankAccount> readFromBankFile(String filePath) {
+        try (MyObjectInputStream objectInputStream = new MyObjectInputStream(new FileInputStream(filePath))) {
+            List<BankAccount> accounts = new ArrayList<>();
+            while (true) {
+                try {
+                    BankAccount account = (BankAccount) objectInputStream.readObject();
+                    accounts.add(account);
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+            return accounts;
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

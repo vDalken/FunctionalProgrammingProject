@@ -115,11 +115,11 @@ public class Main {
         Log.printAmountQuestion();
         int amountToTransfer = scan.nextInt();
         if (bankAccountsHandler.isAccountNumberValid(accountNumber) && loggedAccount.getBalance() >= amountToTransfer) {
-            bankAccountsHandler.transfer(loggedAccount, accountNumber, amountToTransfer);
+            bankAccountsHandler.processTransfer(loggedAccount, accountNumber, amountToTransfer);
             loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amountToTransfer);
         } else {
             Log.printAccountTransferError();
-            bankAccountsHandler.transfer(loggedAccount,accountNumber,amountToTransfer);
+            bankAccountsHandler.processTransfer(loggedAccount,accountNumber,amountToTransfer);
             Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
             loggedAccount.getTransactionHistory().add(transaction);
         }
