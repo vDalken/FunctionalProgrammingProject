@@ -1,4 +1,8 @@
-import java.io.*;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,14 +12,13 @@ public class BankDataHandler implements Serializable {
     //TODO ask if I can use the try with resources without declaring and initializing the same thing everytime
     private final String BANK_ACCOUNTS_FILE_PATH;
     private final String TRANSACTIONS_FILE_PATH;
-    private final ArrayList<BankAccount> temporaryBankAccounts = new ArrayList<>();
 
-    public BankDataHandler(String bankAccountsFilePath, String transactionsFilePath) {
+    public BankDataHandler(final String bankAccountsFilePath, final String transactionsFilePath) {
         BANK_ACCOUNTS_FILE_PATH = bankAccountsFilePath;
         TRANSACTIONS_FILE_PATH = transactionsFilePath;
     }
 
-    public void createAccount(BankAccount bankAccount) {
+    public void createAccount(final BankAccount bankAccount) {
         try (MyObjectOutputStream myObjectOutputStream = new MyObjectOutputStream(new FileOutputStream(BANK_ACCOUNTS_FILE_PATH, true))) {
             myObjectOutputStream.writeObject(bankAccount);
         } catch (IOException e) {
@@ -23,16 +26,16 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    public Optional<BankAccount> logIn(int accountNumber, int password) {
+    public Optional<BankAccount> logIn(final int accountNumber, final int password) {
         return readFromBankFile(BANK_ACCOUNTS_FILE_PATH)
                 .stream()
-                .filter(account -> account.getAccountNumber() == accountNumber &&
-                        account.getPassword() == password &&
-                        account.getAccountStatus().equals(AccountStatus.ACTIVE))
+                .filter(account -> account.getAccountNumber() == accountNumber
+                        && account.getPassword() == password
+                        && account.getAccountStatus().equals(AccountStatus.ACTIVE))
                 .findFirst();
     }
 
-    public void processTransfer(BankAccount loggedAccount, int accountNumber, int amountToTransfer) {
+    public void processTransfer(final BankAccount loggedAccount, final int accountNumber, final int amountToTransfer) {
         List<BankAccount> accounts = readFromBankFile(BANK_ACCOUNTS_FILE_PATH);
 
         if (!isAccountNumberValid(accountNumber) || !(loggedAccount.getBalance() >= amountToTransfer)) {
@@ -61,13 +64,13 @@ public class BankDataHandler implements Serializable {
         updateBankAccountsFile(updatedAccounts);
     }
 
-    private BankAccount updateBankAccount(BankAccount bankAccount, double newBalance, Transaction transaction) {
+    private BankAccount updateBankAccount(final BankAccount bankAccount, final double newBalance, final Transaction transaction) {
         BankAccount updatedBankAccount = updateBankAccount(bankAccount, newBalance);
         updatedBankAccount.getTransactionHistory().add(transaction);
         return updatedBankAccount;
     }
 
-    private void updateLoggedAccountTransactionHistory(int loggedAccountNumber, Transaction transaction) {
+    private void updateLoggedAccountTransactionHistory(final int loggedAccountNumber, final Transaction transaction) {
         List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
@@ -90,7 +93,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    private BankAccount updateBankAccount(BankAccount bankAccount, double newBalance) {
+    private BankAccount updateBankAccount(final BankAccount bankAccount, final double newBalance) {
         return new BankAccountBuilder()
                 .accountHoldersName(bankAccount.getAccountHoldersName())
                 .accountNumber(bankAccount.getAccountNumber())
@@ -102,7 +105,7 @@ public class BankDataHandler implements Serializable {
                 .build();
     }
 
-    private BankAccount updateBankAccountStatus(BankAccount bankAccount) {
+    private BankAccount updateBankAccountStatus(final BankAccount bankAccount) {
         return new BankAccountBuilder()
                 .accountHoldersName(bankAccount.getAccountHoldersName())
                 .accountNumber(bankAccount.getAccountNumber())
@@ -129,7 +132,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    public void documentTransaction(Transaction transaction) {
+    public void documentTransaction(final Transaction transaction) {
         try (MyObjectOutputStream objectOutputStream = new MyObjectOutputStream(new FileOutputStream(TRANSACTIONS_FILE_PATH, true))) {
             objectOutputStream.writeObject(transaction);
         } catch (IOException e) {
@@ -137,7 +140,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    public boolean isAccountNumberValid(int accountNumber) {
+    public boolean isAccountNumberValid(final int accountNumber) {
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
             while (true) {
@@ -156,7 +159,7 @@ public class BankDataHandler implements Serializable {
         return false;
     }
 
-    public void deposit(int loggedAccountNumber, int amount) {
+    public void deposit(final int loggedAccountNumber, final int amount) {
         List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
@@ -180,7 +183,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    public void withdrawal(int loggedAccountNumber, int amount) {
+    public void withdrawal(final int loggedAccountNumber, final int amount) {
         List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
@@ -204,7 +207,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    public void blockCard(int loggedAccountNumber) {
+    public void blockCard(final int loggedAccountNumber) {
         List<BankAccount> temporaryBankAccounts = new ArrayList<>();
         try (MyObjectInputStream myObjectInputStream = new MyObjectInputStream(new FileInputStream(BANK_ACCOUNTS_FILE_PATH))) {
             BankAccount bankAccount;
@@ -227,7 +230,7 @@ public class BankDataHandler implements Serializable {
         }
     }
 
-    private List<BankAccount> readFromBankFile(String filePath) {
+    private List<BankAccount> readFromBankFile(final String filePath) {
         try (MyObjectInputStream objectInputStream = new MyObjectInputStream(new FileInputStream(filePath))) {
             List<BankAccount> accounts = new ArrayList<>();
             while (true) {
