@@ -18,7 +18,7 @@ This project is a simple command-line bank application that embraces functional 
 3. **Account Balances:**
    - Users can check their account balances.
 
-4. **Transaction History:**
+4. **modelclasses.Transaction History:**
    - A transaction history feature tracking all deposits and withdrawals for each account was implemented.
 
 5. **Functional Programming Concepts:**

@@ -1,7 +1,13 @@
+package operationclasses;
+
+import datahandling.BankDataHandler;
+import loggingclasses.Log;
+import modelclasses.BankAccount;
+import modelclasses.Transaction;
 import java.util.Optional;
 import java.util.Scanner;
 
-class OperationsService {
+public class OperationsService {
     private final BankDataHandler BANK_ACCOUNTS_HANDLER;
 
     public OperationsService(BankDataHandler BANK_ACCOUNTS_HANDLER) {

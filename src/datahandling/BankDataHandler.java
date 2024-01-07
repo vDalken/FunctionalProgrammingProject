@@ -1,3 +1,11 @@
+package datahandling;
+
+import enums.AccountStatus;
+import ioclasses.MyObjectInputStream;
+import ioclasses.MyObjectOutputStream;
+import modelclasses.BankAccount;
+import modelclasses.Transaction;
+
 import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

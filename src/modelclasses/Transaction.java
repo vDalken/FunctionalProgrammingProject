@@ -1,3 +1,5 @@
+package modelclasses;
+
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -38,7 +40,7 @@ public class Transaction implements Serializable {
 
     @Override
     public String toString() {
-        return "Transaction{" +
+        return "modelclasses.Transaction{" +
                 "Account Number=" + accountNumber +
                 ", Amount To Transfer=" + amountToTransfer +
                 ", Was Successful?=" + wasSuccessful(wasSuccessful) +

@@ -1,3 +1,11 @@
+package mainclass;
+
+import datahandling.BankDataHandler;
+import loggingclasses.Log;
+import loggingclasses.MenuHelper;
+import modelclasses.BankAccount;
+import operationclasses.OperationsService;
+
 import java.util.InputMismatchException;
 import java.util.Optional;
 import java.util.Scanner;

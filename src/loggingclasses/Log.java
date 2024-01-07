@@ -1,4 +1,6 @@
-import java.util.logging.LogManager;
+package loggingclasses;
+
+import modelclasses.BankAccount;
 
 public final class Log {
     private Log() {
@@ -34,7 +36,7 @@ public final class Log {
     }
 
     public static void printLogInError(){
-        System.err.println("\nYou didn't put the right details. Log In unsuccessful\n");
+        System.err.println("\nYou didn't put the right details. loggingclasses.Log In unsuccessful\n");
     }
 
     public static void printLogInSuccess(){

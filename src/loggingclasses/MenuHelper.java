@@ -1,11 +1,13 @@
-class MenuHelper {
+package loggingclasses;
+
+public class MenuHelper {
     private MenuHelper() {
     }
 
     public static void printInitialMenu(){
         System.out.println("0. Exit");
         System.out.println("1. Create Account");
-        System.out.println("2. Log In");
+        System.out.println("2. loggingclasses.Log In");
     }
 
     public static void printLoggedMenu(){

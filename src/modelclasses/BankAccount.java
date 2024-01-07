@@ -1,3 +1,7 @@
+package modelclasses;
+
+import enums.AccountStatus;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -85,14 +89,6 @@ public final class BankAccount implements Serializable {
         return accountStatus;
     }
 
-    public BankAccount deposit(DepositOperation depositOperation, double amount) {
-        return depositOperation.perform(this, amount);
-    }
-
-    public BankAccount withdrawal(WithdrawalOperation withdrawalOperation, double amount) {
-        return withdrawalOperation.perform(this, amount);
-    }
-
     public static BankAccount createAccountWithUpdatedBalance(BankAccount account, double newBalance) {
         return new BankAccountBuilder()
                 .accountHoldersName(account.getAccountHoldersName())
@@ -119,7 +115,7 @@ public final class BankAccount implements Serializable {
                 "\nAccount Number: " + accountNumber +
                 "\nPassword=" + password +
                 "\nBalance=" + balance +
-                "\n\nTransaction History:\n" + showTransactionHistory() +
+                "\n\nmodelclasses.Transaction History:\n" + showTransactionHistory() +
                 "\n\nAccount Opening Date='" + accountOpeningDate + '\'' +
                 "\nAccount Status=" + accountStatus + "\n";
     }
