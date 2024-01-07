@@ -45,7 +45,8 @@ public class BankDataHandler implements Serializable {
             return;
         }
 
-        List<BankAccount> updatedAccounts = accounts.stream()
+        List<BankAccount> updatedAccounts = accounts
+                .stream()
                 .map(account -> {
                     if (account.getAccountNumber() == accountNumber) {
                         double newBalance = account.getBalance() + amountToTransfer;
@@ -94,7 +95,7 @@ public class BankDataHandler implements Serializable {
     }
 
     private BankAccount updateBankAccount(final BankAccount bankAccount, final double newBalance) {
-        return new BankAccountBuilder()
+        return new BankAccount.BankAccountBuilder()
                 .accountHoldersName(bankAccount.getAccountHoldersName())
                 .accountNumber(bankAccount.getAccountNumber())
                 .balance(newBalance)
@@ -106,7 +107,7 @@ public class BankDataHandler implements Serializable {
     }
 
     private BankAccount updateBankAccountStatus(final BankAccount bankAccount) {
-        return new BankAccountBuilder()
+        return new BankAccount.BankAccountBuilder()
                 .accountHoldersName(bankAccount.getAccountHoldersName())
                 .accountNumber(bankAccount.getAccountNumber())
                 .balance(bankAccount.getBalance())
