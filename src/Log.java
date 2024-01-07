@@ -1,26 +1,11 @@
+import java.util.logging.LogManager;
+
 public final class Log {
     private Log() {
     }
-
-    public static void printInitialMenu(){
-        System.out.println("0. Exit");
-        System.out.println("1. Create Account");
-        System.out.println("2. Log In");
-    }
-
-    public static void printUserMenu(){
-        System.out.println("0. Go Back");
-        System.out.println("1. Transfer");
-        System.out.println("2. Withdrawal");
-        System.out.println("3. Deposit");
-        System.out.println("4. Block Card");
-        System.out.println("5. Card Info");
-    }
-
     public static void printChoiceErrorMessage(){
         System.out.println("You chose a option that doesn't exist");
     }
-
     public static void printLeavingMessage(){
         System.out.println("\nYou're leaving the app\n");
     }
@@ -54,15 +39,6 @@ public final class Log {
 
     public static void printLogInSuccess(){
         System.out.println("\nYou are now logged in\n");
-    }
-
-    public static void printLoggedMenu(){
-        System.out.println("0. Go Back");
-        System.out.println("1. Transfer");
-        System.out.println("2. Withdrawal");
-        System.out.println("3. Deposit");
-        System.out.println("4. Block Card");
-        System.out.println("5. Card Info");
     }
 
     public static void printAmountQuestion(){

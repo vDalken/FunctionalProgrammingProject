@@ -25,7 +25,7 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         int choice;
         do {
-            Log.printInitialMenu();
+            MenuHelper.printInitialMenu();
             choice = scan.nextInt();
             switch (choice) {
                 case LEAVE:
@@ -75,7 +75,7 @@ public class Main {
             if (loggedAccount == null) {
                 break;
             }
-            Log.printLoggedMenu();
+            MenuHelper.printLoggedMenu();
             choice = scan.nextInt();
             switch (choice) {
                 case LEAVE:
