@@ -18,6 +18,7 @@ public class Main {
             BANK_ACCOUNTS_FILE_PATH,
             TRANSACTIONS_FILE_PATH
     );
+    private static final OperationsService OPERATIONS_SERVICE = new OperationsService(BANK_ACCOUNTS_HANDLER);
     private static BankAccount loggedAccount;
 
     public static void main(final String[] args) {
@@ -48,9 +49,7 @@ public class Main {
         Log.printAccountsHoldersNameQuestion();
         scan.nextLine();
         String accountHoldersName = scan.nextLine();
-        BankAccount newAccount = new BankAccount(accountHoldersName);
-        Log.printNewAccountInformation(newAccount);
-        BANK_ACCOUNTS_HANDLER.createAccount(newAccount);
+        OPERATIONS_SERVICE.createAccount(accountHoldersName);
     }
 
     private static void logIn(Scanner scan) {
@@ -59,7 +58,7 @@ public class Main {
             int accountNumber = scan.nextInt();
             Log.printPasswordQuestion();
             int password = scan.nextInt();
-            Optional<BankAccount> account = BANK_ACCOUNTS_HANDLER.logIn(accountNumber, password);
+            Optional<BankAccount> account = OPERATIONS_SERVICE.logIn(accountNumber,password);
             loggedAccount = account.orElse(null);
             if (loggedAccount == null) {
                 Log.printLogInError();
@@ -70,7 +69,6 @@ public class Main {
             System.err.println("You need to write a valid account NUMBER");
         }
     }
-
     private static void loggedMenu(Scanner scan) {
         int choice;
         do {
@@ -84,16 +82,16 @@ public class Main {
                     Log.printLoggingOutMessage();
                     break;
                 case TRANSFER:
-                    transfer(scan);
+                    OPERATIONS_SERVICE.transfer(scan, loggedAccount);
                     break;
                 case WITHDRAWAL:
-                    withdrawal(scan);
+                    OPERATIONS_SERVICE.withdrawal(scan, loggedAccount);
                     break;
                 case DEPOSIT:
-                    deposit(scan);
+                    OPERATIONS_SERVICE.deposit(scan, loggedAccount);
                     break;
                 case BLOCK_CARD:
-                    blockCard(scan);
+                    OPERATIONS_SERVICE.blockCard(scan, loggedAccount);
                     break;
                 case CARD_INFO:
                     System.out.println(loggedAccount.toString());
@@ -103,52 +101,5 @@ public class Main {
                     break;
             }
         } while (choice != LEAVE);
-    }
-
-    private static void transfer(Scanner scan) {
-        Log.printAccountNumberQuestion();
-        int accountNumber = scan.nextInt();
-        Log.printAmountQuestion();
-        int amountToTransfer = scan.nextInt();
-        if (BANK_ACCOUNTS_HANDLER.isAccountNumberValid(accountNumber) && loggedAccount.getBalance() >= amountToTransfer) {
-            BANK_ACCOUNTS_HANDLER.processTransfer(loggedAccount, accountNumber, amountToTransfer);
-            loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amountToTransfer);
-        } else {
-            Log.printAccountTransferError();
-            BANK_ACCOUNTS_HANDLER.processTransfer(loggedAccount, accountNumber, amountToTransfer);
-            Transaction transaction = new Transaction(loggedAccount.getAccountNumber(), accountNumber, amountToTransfer, false);
-            loggedAccount.getTransactionHistory().add(transaction);
-        }
-    }
-
-    private static void deposit(final Scanner scan) {
-        Log.printAmountQuestion();
-        int amount = scan.nextInt();
-        BANK_ACCOUNTS_HANDLER.deposit(loggedAccount.getAccountNumber(), amount);
-        loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() + amount);
-        Log.printSuccessfulDeposit();
-    }
-
-    private static void withdrawal(final Scanner scan) {
-        Log.printAmountQuestion();
-        int amount = scan.nextInt();
-        if (amount > loggedAccount.getBalance()) {
-            Log.printNotEnoughBalance();
-        } else {
-            BANK_ACCOUNTS_HANDLER.withdrawal(loggedAccount.getAccountNumber(), amount);
-            loggedAccount = BankAccount.createAccountWithUpdatedBalance(loggedAccount, loggedAccount.getBalance() - amount);
-            Log.printSuccessfulWithdrawal();
-        }
-    }
-
-    private static void blockCard(final Scanner scan) {
-        Log.printBlockBankAccountQuestion();
-        scan.nextLine();
-        String choice = scan.nextLine();
-        if (choice.trim().equals("Y")) {
-            BANK_ACCOUNTS_HANDLER.blockCard(loggedAccount.getAccountNumber());
-            loggedAccount = null;
-            Log.printBlockedBankAccountMessage();
-        }
     }
 }
